@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { query, lat, lng, type } = req.query;
+  const { query, lat, lng, type, keyword } = req.query;
 
   if (!lat || !lng) {
     return res.status(400).json({ error: 'lat and lng are required' });
@@ -17,54 +17,95 @@ export default async function handler(req, res) {
     hospital: 'hospital',
     pharmacy: 'pharmacy',
     doctor: 'doctor',
+    dentist: 'dentist',
   };
 
-  const includedTypes = type && typeMapping[type] ? [typeMapping[type]] : ['hospital'];
+  const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+  const FIELD_MASK =
+    'places.displayName,places.formattedAddress,places.location,places.rating,places.currentOpeningHours,places.id';
 
   try {
-    const body = {
-      includedTypes,
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
+    let places;
+
+    if (keyword) {
+      // Specialty search via searchText + locationBias
+      const body = {
+        textQuery: keyword,
+        maxResultCount: 20,
+        locationBias: {
+          circle: {
+            center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
+            radius: 5000.0,
           },
-          radius: 5000.0,
         },
-      },
-    };
+      };
 
-    if (query) {
-      body.textQuery = query;
+      const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GOOGLE_API_KEY,
+          'X-Goog-FieldMask': FIELD_MASK,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json({ error: data.error?.message || 'Places API error' });
+      }
+
+      places = (data.places || []).map((place) => ({
+        id: place.id,
+        name: place.displayName?.text || '',
+        address: place.formattedAddress || '',
+        location: place.location || null,
+        rating: place.rating || null,
+        openNow: place.currentOpeningHours?.openNow ?? null,
+      }));
+    } else {
+      // Type-based search via searchNearby
+      const includedTypes = type && typeMapping[type] ? [typeMapping[type]] : ['doctor'];
+
+      const body = {
+        includedTypes,
+        maxResultCount: 20,
+        locationRestriction: {
+          circle: {
+            center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
+            radius: 5000.0,
+          },
+        },
+      };
+
+      if (query) {
+        body.textQuery = query;
+      }
+
+      const response = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GOOGLE_API_KEY,
+          'X-Goog-FieldMask': FIELD_MASK,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json({ error: data.error?.message || 'Places API error' });
+      }
+
+      places = (data.places || []).map((place) => ({
+        id: place.id,
+        name: place.displayName?.text || '',
+        address: place.formattedAddress || '',
+        location: place.location || null,
+        rating: place.rating || null,
+        openNow: place.currentOpeningHours?.openNow ?? null,
+      }));
     }
-
-    const response = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': process.env.GOOGLE_PLACES_API_KEY,
-        'X-Goog-FieldMask':
-          'places.displayName,places.formattedAddress,places.location,places.rating,places.currentOpeningHours,places.id',
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Places API error' });
-    }
-
-    const places = (data.places || []).map((place) => ({
-      id: place.id,
-      name: place.displayName?.text || '',
-      address: place.formattedAddress || '',
-      location: place.location || null,
-      rating: place.rating || null,
-      openNow: place.currentOpeningHours?.openNow ?? null,
-    }));
 
     return res.status(200).json({ places });
   } catch (error) {
