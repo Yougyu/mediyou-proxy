@@ -90,7 +90,7 @@ export default function handler(req, res) {
 
 <header>
   <h1>&#9679; MediYou — Datenschutzerklärung</h1>
-  <p>Stand: Mai 2026 &nbsp;|&nbsp; Version 1.0</p>
+  <p>Stand: Juni 2026 &nbsp;|&nbsp; Version 1.1</p>
 </header>
 
 <main>
@@ -106,8 +106,7 @@ export default function handler(req, res) {
   <p>
     MediYou ist eine Gesundheits-App für iOS. Die App verarbeitet ausschließlich Daten,
     die Sie selbst eingeben. Es gibt kein Backend, keine zentrale Datenbank und kein
-    Account-System. Die Nutzung der KI-Funktionen erfordert eine Internetverbindung;
-    alle anderen Funktionen sind vollständig offline nutzbar.
+    Account-System. Mit Ausnahme der Arztsuche (Google Places) sind alle Funktionen vollständig offline nutzbar.
   </p>
 
   <h2>3. Welche Daten werden verarbeitet?</h2>
@@ -115,12 +114,12 @@ export default function handler(req, res) {
   <h3>3.1 Lokal gespeicherte Daten (AsyncStorage auf Ihrem Gerät)</h3>
   <p>
     Alle folgenden Daten werden ausschließlich lokal auf Ihrem iPhone gespeichert
-    und verlassen das Gerät nur im Rahmen der unter Punkt&nbsp;4 beschriebenen KI-Anfragen:
+    und verlassen das Gerät nur, wenn Sie sie selbst aktiv exportieren:
   </p>
   <ul>
     <li><strong>Profildaten:</strong> Alter, Geschlecht, Größe, Gewicht, bekannte Erkrankungen</li>
     <li><strong>Medikamentendaten:</strong> Name, Dosierung, Einnahmezeiten, Einnahmeprotokoll</li>
-    <li><strong>Symptome:</strong> Art, Schweregrad, Datum, KI-Analyseergebnisse</li>
+    <li><strong>Symptome:</strong> Art, Schweregrad, Datum, Analyseergebnisse (lokal erstellt)</li>
     <li><strong>Blutbildwerte:</strong> Laborwerte, hochgeladene Bilder/PDFs, Analyseergebnisse</li>
     <li><strong>Diabetes-Daten:</strong> Blutzuckermessungen, Insulineinträge, Einstellungen, Augen- und Fußcheck-Fotos</li>
     <li><strong>Frauengesundheit:</strong> Zykluseinträge, Zykluseinstellungen, Verhütungsmittel, Pillen-Einnahmeprotokoll, Schwangerschaftsdaten</li>
@@ -135,28 +134,8 @@ export default function handler(req, res) {
   </p>
 
   <h3>3.2 Daten, die an externe Dienste übertragen werden</h3>
-  <h3>KI-Analysen via Claude API (Anthropic)</h3>
-  <p>
-    Für KI-gestützte Funktionen (Medikamenten-Analyse, Symptom-Check, Blutbild-Analyse,
-    Zyklusanalyse, Wochenplan-Generierung u.&nbsp;a.) werden Teile Ihrer Gesundheitsdaten an
-    die Claude API von Anthropic PBC übertragen. Die Übertragung erfolgt verschlüsselt
-    (HTTPS) über einen Vercel-Proxy-Server.
-  </p>
-  <p><strong>Übertragene Datenkategorien je nach genutzter Funktion:</strong></p>
-  <ul>
-    <li>Symptome und deren Verlauf</li>
-    <li>Medikamentenliste und Dosierungen</li>
-    <li>Zyklusdaten und Schwangerschaftsinformationen</li>
-    <li>Blutbildwerte und -bilder (Base64-kodiert)</li>
-    <li>Profildaten (Alter, Geschlecht, bekannte Erkrankungen)</li>
-  </ul>
-  <p>
-    Anthropic verarbeitet diese Daten als Auftragsverarbeiter ausschließlich zur Bearbeitung
-    Ihrer Anfrage. Anthropic speichert Eingabe-Daten standardmäßig für 30 Tage zu
-    Trust&nbsp;&amp;&nbsp;Safety-Zwecken. Weitere Informationen:
-    <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">anthropic.com/privacy</a>
-  </p>
-  <p><strong>Hinweis:</strong> Vor der ersten KI-Anfrage werden Sie um Ihre ausdrückliche Einwilligung gebeten.</p>
+  <h3>Keine KI-Datenübermittlung in dieser Version</h3>
+  <p>In dieser Version werden keine Gesundheits- oder Medikamentendaten an externe Server übermittelt. Eine KI-Analyse über externe Dienste findet nicht statt.</p>
 
   <h3>Arztsuche via Google Places API</h3>
   <p>
@@ -185,11 +164,6 @@ export default function handler(req, res) {
     </thead>
     <tbody>
       <tr>
-        <td>Anthropic PBC, San Francisco, USA</td>
-        <td>KI-Analyse Ihrer Gesundheitsdaten</td>
-        <td>Art. 6 Abs. 1 lit. a + Art. 9 Abs. 2 lit. a DSGVO</td>
-      </tr>
-      <tr>
         <td>Google LLC (nur bei Arztsuche)</td>
         <td>Standortbasierte Arztsuche</td>
         <td>Art. 6 Abs. 1 lit. a DSGVO</td>
@@ -200,10 +174,9 @@ export default function handler(req, res) {
 
   <h2>6. Übermittlung in Drittländer</h2>
   <p>
-    Bei der Nutzung der Claude API werden Ihre Daten an Anthropic PBC mit Sitz in den USA
-    übermittelt. Die USA gelten datenschutzrechtlich als unsicheres Drittland. Die Übermittlung
-    erfolgt auf Grundlage Ihrer ausdrücklichen Einwilligung nach Art. 49 Abs. 1 lit. a DSGVO.
-    Sie werden vor der ersten KI-Anfrage ausdrücklich auf diese Übermittlung hingewiesen.
+    Bei Nutzung der Arztsuche werden Ihre GPS-Koordinaten an Google LLC (USA) übermittelt.
+    Google LLC ist nach dem EU-U.S. Data Privacy Framework zertifiziert; die Übermittlung
+    erfolgt auf Grundlage des Angemessenheitsbeschlusses (Art. 45 DSGVO).
   </p>
 
   <h2>7. Speicherdauer</h2>
@@ -216,11 +189,6 @@ export default function handler(req, res) {
         <td>Alle lokalen Gesundheitsdaten</td>
         <td>Ihr iPhone (AsyncStorage)</td>
         <td>Bis zur manuellen Löschung oder App-Deinstallation</td>
-      </tr>
-      <tr>
-        <td>KI-Anfragedaten</td>
-        <td>Anthropic-Server</td>
-        <td>Bis zu 30 Tage (Trust &amp; Safety), danach gelöscht</td>
       </tr>
       <tr>
         <td>GPS-Koordinaten (Arztsuche)</td>
@@ -265,7 +233,6 @@ export default function handler(req, res) {
   <ul>
     <li>Alle Daten werden lokal auf Ihrem Gerät in der durch iOS geschützten App-Sandbox gespeichert.</li>
     <li>Alle Netzwerkübertragungen erfolgen ausschließlich über HTTPS/TLS.</li>
-    <li>Der Anthropic-API-Schlüssel wird nicht in der App gespeichert, sondern über einen serverseitigen Proxy verwaltet.</li>
     <li>Die App enthält kein Analytics, kein Tracking und keine Werbung.</li>
     <li>Es gibt keine Nutzerkonten, keine Passwörter und keine zentrale Datenhaltung.</li>
   </ul>
@@ -278,8 +245,8 @@ export default function handler(req, res) {
 
   <h2>12. Gesundheitsinformationen – Haftungsausschluss</h2>
   <p>
-    MediYou ist eine Informations- und Unterstützungs-App. Die KI-generierten Analysen
-    und Empfehlungen stellen <strong>keine</strong> medizinische Diagnose und
+    MediYou ist eine Informations- und Unterstützungs-App. Die Inhalte der App
+    stellen <strong>keine</strong> medizinische Diagnose und
     <strong>keine</strong> ärztliche Beratung dar. Konsultieren Sie bei gesundheitlichen
     Fragen stets einen Arzt oder Apotheker. Der Betreiber übernimmt keine Haftung für
     Schäden, die aus der Nutzung der App-Inhalte entstehen.
@@ -296,7 +263,7 @@ export default function handler(req, res) {
 </main>
 
 <footer>
-  Tübingen, Mai 2026 &nbsp;·&nbsp; Seongkyeom Kim &nbsp;·&nbsp;
+  Tübingen, Juni 2026 &nbsp;·&nbsp; Seongkyeom Kim &nbsp;·&nbsp;
   <a href="mailto:tjd2937@gmail.com">tjd2937@gmail.com</a>
 </footer>
 
